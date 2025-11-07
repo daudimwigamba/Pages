@@ -1,4 +1,5 @@
 'use client'
+import { Redirect } from "next";
 import React from "react";
 import Image from "next/image";
 import { useState } from "react";

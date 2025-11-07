@@ -1,4 +1,6 @@
-export default function App()
-{
-  return <h1>Hello, NextJs!</h1>
+// app/page.tsx
+import { redirect } from "next/navigation";
+
+export default function HomePage() {
+  redirect("/loginpageui");
 }
