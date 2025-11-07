@@ -21,6 +21,7 @@ function LoginPage()
       <div className="w-200 h-200 bg-white">
         <div>
            <form className="max-w-sm mx-auto mt-10 space-y-4 mt-70">
+            <h1 className="text-xl font-extrabold text-black text-center">Sign In</h1>
             <label className="block text-sm font-medium text-black">Username</label>
             <input type="text" className="w-full border-1 rounded p-2 border-black text-black" />
             <label className="block text-sm font-medium text-black">Password</label>
