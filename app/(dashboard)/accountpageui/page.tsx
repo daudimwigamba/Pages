@@ -1,4 +1,4 @@
-
+import { Button } from "@/components/ui/button";
 
 export default function ViewAccountInfo() {
   // In a real app, this data would come from a database or API
@@ -61,6 +61,9 @@ export default function ViewAccountInfo() {
           </button>
         </div>
       </section>
+
+
+   
     </>
   );
 }

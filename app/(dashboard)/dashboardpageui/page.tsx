@@ -1,4 +1,5 @@
 "use client";
+import { error } from "console";
 import React, { useState } from "react";
 
 const HomePage = () => {
@@ -13,6 +14,8 @@ const HomePage = () => {
     address: "",
     phoneno: "",
     gender: "M",
+    mstatus: "",
+    sname: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -38,6 +41,7 @@ const HomePage = () => {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Email is not valid";
     }
+    if(!formData.sname.trim()) newErrors.sname = "Spouse name is required"
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -59,6 +63,8 @@ const HomePage = () => {
         address: "",
         phoneno: "",
         gender: "M",
+        mstatus: "",
+        sname: "",
       });
     } else {
       toast.error("Please fix the highlighted errors");
@@ -94,7 +100,7 @@ const HomePage = () => {
 
           {/** Middle Name */}
           <div>
-            <label className="block text-gray-950 mb-1">Second Name</label>
+            <label className="block text-gray-950 mb-1">Middle Name</label>
             <input
               type="text"
               name="mname"
@@ -135,7 +141,7 @@ const HomePage = () => {
 
           {/** ID Type */}
           <div>
-            <label className="block text-gray-950 mb-1">ID Type</label>
+            <label className="block text-gray-950 mb-1">Identification Type</label>
             <input
               type="text"
               name="idtype"
@@ -145,16 +151,14 @@ const HomePage = () => {
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
             <datalist id="IDType">
-              <option value="NIDA" />
-              <option value="Passport" />
-              <option value="Driver’s License" />
+              <option value="NIDA"/>
             </datalist>
             {errors.idtype && <p className="text-red-500 text-sm">{errors.idtype}</p>}
           </div>
 
           {/** ID Number */}
           <div>
-            <label className="block text-gray-950 mb-1">ID No</label>
+            <label className="block text-gray-950 mb-1">Identification Number</label>
             <input
               type="text"
               name="idno"
@@ -220,8 +224,38 @@ const HomePage = () => {
               <option value="F">Female</option>
             </select>
           </div>
-        </form>
 
+
+             {/** Marital Status */}
+          <div>
+            <label className="block text-gray-950 mb-1">Marital Status</label>
+            <select
+              name="mstatus"
+              value={formData.gender}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+            >
+              <option value="Single">Single</option>
+              <option value="Married">Married</option>
+               <option value="Separated">Separated</option>
+               <option value="Widowed">Widowed</option>
+            </select>
+          </div>
+
+             {/**Spouse Name*/}
+          <div>
+            <label className="block text-gray-950 mb-1">Spouse Name</label>
+              <input
+              type="text"
+              name="sname"
+              value={formData.mname}
+              onChange={handleChange}
+              placeholder="Enter Spuse name"
+              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+            />
+            {errors.sname && <p className="text-red-500 text-sm">{errors.sname}</p>}
+          </div>
+        </form>
         <div className="flex justify-center mt-10">
           <button
             type="button"
