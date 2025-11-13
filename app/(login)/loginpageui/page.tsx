@@ -23,6 +23,28 @@ function LoginPage() {
       });
 
       const data = await res.json();
+
+      const token = data.token;
+
+      if (token) {
+        const cookieRes = await fetch("/api/login", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({token}),
+        });
+
+      if (cookieRes.ok) {
+        window.location.href = "/dashboardpageui";
+      }
+      else {
+        alert("Failure to save token cookie!")
+      }
+      }
+      else {
+        alert("Login failed. No token received.")
+      }
+
+
       setResponseData(data); // display the JSON data
     } catch (error) {
       console.error(error);
