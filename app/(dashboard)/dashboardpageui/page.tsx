@@ -50,7 +50,6 @@ const HomePage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      toast.success("Form submitted successfully!");
       console.log("Form Data:", formData);
       setFormData({
         fname: "",
@@ -66,8 +65,6 @@ const HomePage = () => {
         mstatus: "",
         sname: "",
       });
-    } else {
-      toast.error("Please fix the highlighted errors");
     }
   };
 
