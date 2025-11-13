@@ -9,6 +9,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [responseData, setResponseData] = useState<any>(null); // store JSON response
 
+  //handling submit form request
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
