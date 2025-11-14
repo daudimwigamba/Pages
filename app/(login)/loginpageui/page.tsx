@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@radix-ui/react-switch";
 
 function LoginPage() {
   const [domainEmail, setName] = useState("");
@@ -98,11 +99,10 @@ function LoginPage() {
             className="w-full border-2 rounded p-2 border-black text-black outline-none"
             required
           />
-
           <Button
             type="submit"
             disabled={loading}
-            className="w-50 ml-18 mt-11 p-2 bg-blue-400 hover:bg-blue-500 active:bg-blue-600 rounded-2xl"
+            variant="outline" size="lg" aria-label="Submit" className="bg-blue-400 hover:bg-blue-300 w-full rounded-md my-6"
           >
             {loading ? "Loading..." : "Login"}
           </Button>

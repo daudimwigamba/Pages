@@ -1,70 +1,98 @@
 "use client";
-import { error } from "console";
 import React, { useState } from "react";
 
 const HomePage = () => {
   const [formData, setFormData] = useState({
-    fname: "",
-    mname: "",
-    lname: "",
-    dob: "",
-    idtype: "",
-    idno: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    dateofBirth: "",
+    identificationType: "",
+    identificationNumber: "",
     email: "",
     address: "",
-    phoneno: "",
+    contact: "",
     gender: "M",
-    mstatus: "",
-    sname: "",
+    marriageStatus: "",
+    spouseName: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [message, setMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // Handle input change
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Validate form
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.fname.trim()) newErrors.fname = "First name is required";
-    if (!formData.mname.trim()) newErrors.mname = "Middle name is required";
-    if (!formData.lname.trim()) newErrors.lname = "Last name is required";
-    if (!formData.dob) newErrors.dob = "Date of Birth is required";
-    if (!formData.idtype) newErrors.idtype = "Enter ID Type";
-    if (!formData.idno) newErrors.idno = "ID Number is required";
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formData.middleName.trim()) newErrors.middleName = "Middle name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.dateofBirth) newErrors.dateofBirth = "Date of Birth is required";
+    if (!formData.identificationType) newErrors.identificationType = "Enter ID Type";
+    if (!formData.identificationNumber) newErrors.identificationNumber = "ID Number is required";
     if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!formData.phoneno.trim()) newErrors.phoneno = "Enter a valid phone number";
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email is not valid";
-    }
-    if(!formData.sname.trim()) newErrors.sname = "Spouse name is required"
+    if (!formData.contact.trim()) newErrors.contact = "Enter a valid phone number";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Email is not valid";
+    if (formData.marriageStatus === "Married" && !formData.spouseName.trim())
+      newErrors.spouseName = "Spouse name is required for married users";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Submit form
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log("Form Data:", formData);
-      setFormData({
-        fname: "",
-        mname: "",
-        lname: "",
-        dob: "",
-        idtype: "",
-        idno: "",
-        email: "",
-        address: "",
-        phoneno: "",
-        gender: "M",
-        mstatus: "",
-        sname: "",
+    setMessage("");
+
+    if (!validateForm()) return;
+
+    try {
+      const res = await fetch("/api/userdata", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage("Details submitted successfully ");
+        setFormData({
+          firstName: "",
+          middleName: "",
+          lastName: "",
+          dateofBirth: "",
+          identificationType: "",
+          identificationNumber: "",
+          email: "",
+          address: "",
+          contact: "",
+          gender: "M",
+          marriageStatus: "",
+          spouseName: "",
+        });
+
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
+      } 
+      else 
+        {
+        setMessage(data.message || "Failed to submit details ");
+      }
+    } catch (err) {
+      setMessage("Server error, please try again later ");
+      console.error(err);
     }
   };
 
@@ -77,96 +105,90 @@ const HomePage = () => {
       <section className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8">
         <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
 
-        <form
-          onSubmit={handleSubmit}
-          className="grid sm:grid-cols-3 gap-x-8 gap-y-5"
-        >
-          {/** First Name */}
+        <form onSubmit={handleSubmit} className="grid sm:grid-cols-3 gap-x-8 gap-y-5">
+          {/* First Name */}
           <div>
             <label className="block text-gray-950 mb-1">First Name</label>
             <input
               type="text"
-              name="fname"
-              value={formData.fname}
+              name="firstName"
+              value={formData.firstName}
               onChange={handleChange}
-              placeholder="Enter First Name"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.fname && <p className="text-red-500 text-sm">{errors.fname}</p>}
+            {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
           </div>
 
-          {/** Middle Name */}
+          {/* Middle Name */}
           <div>
             <label className="block text-gray-950 mb-1">Middle Name</label>
             <input
               type="text"
-              name="mname"
-              value={formData.mname}
+              name="middleName"
+              value={formData.middleName}
               onChange={handleChange}
-              placeholder="Enter Second Name"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.mname && <p className="text-red-500 text-sm">{errors.mname}</p>}
+            {errors.middleName && <p className="text-red-500 text-sm">{errors.middleName}</p>}
           </div>
 
-          {/** Last Name */}
+          {/* Last Name */}
           <div>
             <label className="block text-gray-950 mb-1">Last Name</label>
             <input
               type="text"
-              name="lname"
-              value={formData.lname}
+              name="lastName"
+              value={formData.lastName}
               onChange={handleChange}
-              placeholder="Enter Last Name"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.lname && <p className="text-red-500 text-sm">{errors.lname}</p>}
+            {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
           </div>
 
-          {/** Date of Birth */}
+          {/* Date of Birth */}
           <div>
             <label className="block text-gray-950 mb-1">Date of Birth</label>
             <input
               type="date"
-              name="dob"
-              value={formData.dob}
+              name="dateofBirth"
+              value={formData.dateofBirth}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
+            {errors.dateofBirth && <p className="text-red-500 text-sm">{errors.dateofBirth}</p>}
           </div>
 
-          {/** ID Type */}
+          {/* ID Type */}
           <div>
-            <label className="block text-gray-950 mb-1">Identification Type</label>
+            <label className="block text-gray-950 mb-1">ID Type</label>
             <input
               type="text"
-              name="idtype"
-              list="IDType"
-              value={formData.idtype}
+              name="identificationType"
+              value={formData.identificationType}
               onChange={handleChange}
+              list="IDType"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
             <datalist id="IDType">
-              <option value="NIDA"/>
+              <option value="NIDA" />
             </datalist>
-            {errors.idtype && <p className="text-red-500 text-sm">{errors.idtype}</p>}
+            {errors.identificationType && <p className="text-red-500 text-sm">{errors.identificationType}</p>}
           </div>
 
-          {/** ID Number */}
+          {/* ID Number */}
           <div>
-            <label className="block text-gray-950 mb-1">Identification Number</label>
+            <label className="block text-gray-950 mb-1">ID Number</label>
             <input
               type="text"
-              name="idno"
-              value={formData.idno}
+              name="identificationNumber"
+              value={formData.identificationNumber}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.idno && <p className="text-red-500 text-sm">{errors.idno}</p>}
+            {errors.identificationNumber && <p className="text-red-500 text-sm">{errors.identificationNumber}</p>}
           </div>
 
-          {/** Email */}
+          {/* Email */}
           <div>
             <label className="block text-gray-950 mb-1">Email</label>
             <input
@@ -174,13 +196,12 @@ const HomePage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="example@gmail.com"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
 
-          {/** Address */}
+          {/* Address */}
           <div>
             <label className="block text-gray-950 mb-1">Address</label>
             <input
@@ -188,27 +209,25 @@ const HomePage = () => {
               name="address"
               value={formData.address}
               onChange={handleChange}
-              placeholder="Enter address"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
             {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
           </div>
 
-          {/** Phone Number */}
+          {/* Contact */}
           <div>
             <label className="block text-gray-950 mb-1">Phone Number</label>
             <input
               type="tel"
-              name="phoneno"
-              value={formData.phoneno}
+              name="contact"
+              value={formData.contact}
               onChange={handleChange}
-              placeholder="+255"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.phoneno && <p className="text-red-500 text-sm">{errors.phoneno}</p>}
+            {errors.contact && <p className="text-red-500 text-sm">{errors.contact}</p>}
           </div>
 
-          {/** Gender */}
+          {/* Gender */}
           <div>
             <label className="block text-gray-950 mb-1">Gender</label>
             <select
@@ -222,46 +241,56 @@ const HomePage = () => {
             </select>
           </div>
 
-
-             {/** Marital Status */}
+          {/* Marital Status */}
           <div>
             <label className="block text-gray-950 mb-1">Marital Status</label>
             <select
-              name="mstatus"
-              value={formData.gender}
+              name="marriageStatus"
+              value={formData.marriageStatus}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             >
+              <option value="">Select..</option>
               <option value="Single">Single</option>
               <option value="Married">Married</option>
-               <option value="Separated">Separated</option>
-               <option value="Widowed">Widowed</option>
+              <option value="Separated">Separated</option>
+              <option value="Widowed">Widowed</option>
             </select>
           </div>
 
-             {/**Spouse Name*/}
+          {/* Spouse Name */}
           <div>
             <label className="block text-gray-950 mb-1">Spouse Name</label>
-              <input
+            <input
               type="text"
-              name="sname"
-              value={formData.mname}
+              name="spouseName"
+              value={formData.spouseName}
               onChange={handleChange}
-              placeholder="Enter Spuse name"
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              disabled={formData.marriageStatus === "Single"}
+              className={`w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none ${
+                formData.marriageStatus === "Single" ? "bg-gray-100 cursor-not-allowed" : ""
+              }`}
             />
-            {errors.sname && <p className="text-red-500 text-sm">{errors.sname}</p>}
+            {errors.spouseName && <p className="text-red-500 text-sm">{errors.spouseName}</p>}
           </div>
-        </form>
-        <div className="flex justify-center mt-10">
+
           <button
-            type="button"
-            onClick={handleSubmit}
-            className="bg-blue-400 hover:bg-blue-500 text-white font-semibold w-40 py-2 rounded-full transition"
+            type="submit"
+            className="bg-blue-400 hover:bg-blue-500 text-white font-semibold w-40 py-2 rounded-full col-span-full mt-6 mx-65"
           >
             Submit
           </button>
-        </div>
+        </form>
+
+        {message && (
+          <p
+            className={`text-center mt-4 font-medium ${
+              message.includes("successfully") ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {message}
+          </p>
+        )}
       </section>
     </main>
   );
