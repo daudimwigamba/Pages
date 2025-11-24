@@ -58,7 +58,7 @@ function LoginPage() {
   return (
     <div className="flex left-0">
       {/* Left side logo */}
-      <div className="w-200 h-200 bg-blue-400">
+      <div className="w-200 h-250 bg-blue-400">
         <Image
           src="/logo2.png"
           alt="mhb logo"

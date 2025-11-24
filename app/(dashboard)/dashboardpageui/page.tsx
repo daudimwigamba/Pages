@@ -6,13 +6,13 @@ const HomePage = () => {
     firstName: "",
     middleName: "",
     lastName: "",
-    dateofBirth: "",
+    dateOfBirth: "",
     identificationType: "",
     identificationNumber: "",
     email: "",
     address: "",
     contact: "",
-    gender: "M",
+    gender: "",
     marriageStatus: "",
     spouseName: "",
   });
@@ -20,11 +20,39 @@ const HomePage = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
 
+  //convert yyyy-mm-dd -> dd-mm-yyyy
+  const formatDateToDDMMYYYY = (date: string) =>
+  {
+    if (!date) return "";
+    const [year, month, day] = date.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   // Handle input change
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    if(name === "marriageStatus")
+    {
+      if (value === "Single") {
+        setFormData((prev) => ({
+          ...prev,
+          marriageStatus: value,
+          spouseName: "None",
+        }));
+      }
+      else
+      {
+        setFormData((prev) => ({
+          ...prev,
+          marriageStatus: value,
+          spouseName: "",
+        }));
+      }
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -35,7 +63,7 @@ const HomePage = () => {
     if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
     if (!formData.middleName.trim()) newErrors.middleName = "Middle name is required";
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!formData.dateofBirth) newErrors.dateofBirth = "Date of Birth is required";
+    if (!formData.dateOfBirth) newErrors.dateOfBirth = "Date of Birth is required";
     if (!formData.identificationType) newErrors.identificationType = "Enter ID Type";
     if (!formData.identificationNumber) newErrors.identificationNumber = "ID Number is required";
     if (!formData.address.trim()) newErrors.address = "Address is required";
@@ -56,14 +84,25 @@ const HomePage = () => {
 
     if (!validateForm()) return;
 
+
+    const formatedDate = formatDateToDDMMYYYY(formData.dateOfBirth);
+
+    const formToSend = {
+      ...formData,
+      dateOfBirth: formatedDate,
+    };
+
+      console.log(formToSend);
+
     try {
       const res = await fetch("/api/userdata", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formToSend),
       });
 
       const data = await res.json();
+      console.log(data);
 
       if (res.ok) {
         setMessage("Details submitted successfully ");
@@ -71,13 +110,13 @@ const HomePage = () => {
           firstName: "",
           middleName: "",
           lastName: "",
-          dateofBirth: "",
+          dateOfBirth: "",
           identificationType: "",
           identificationNumber: "",
           email: "",
           address: "",
           contact: "",
-          gender: "M",
+          gender: "",
           marriageStatus: "",
           spouseName: "",
         });
@@ -88,7 +127,7 @@ const HomePage = () => {
       } 
       else 
         {
-        setMessage(data.message || "Failed to submit details ");
+        setMessage(data.message || "Failed to submit details");
       }
     } catch (err) {
       setMessage("Server error, please try again later ");
@@ -150,12 +189,12 @@ const HomePage = () => {
             <label className="block text-gray-950 mb-1">Date of Birth</label>
             <input
               type="date"
-              name="dateofBirth"
-              value={formData.dateofBirth}
+              name="dateOfBirth"
+              value={formData.dateOfBirth}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.dateofBirth && <p className="text-red-500 text-sm">{errors.dateofBirth}</p>}
+            {errors.dateOfBirth && <p className="text-red-500 text-sm">{errors.dateOfBirth}</p>}
           </div>
 
           {/* ID Type */}
@@ -236,8 +275,9 @@ const HomePage = () => {
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             >
-              <option value="M">Male</option>
-              <option value="F">Female</option>
+                <option value="">Select..</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
             </select>
           </div>
 

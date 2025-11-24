@@ -27,29 +27,33 @@ export async function POST(request: Request) {
       }
     );
 
+    console.log();
+
     console.log("Raw response", request)
     const backendData = await backendRes.json();
     console.log("Parsed JSON from backend",backendData)
 
     if (!backendRes.ok) {
       return NextResponse.json(
-        { message: backendData.message || "Failed to submit details ❌" },
+        { message: backendData.error || "Failed to submit details" }, // changed message to error
         { status: backendRes.status }
       );
+   console.log(body);
     }
+
 
     return NextResponse.json(
       {
-        message: backendData.message || "Details submitted successfully ✅",
+        message: backendData.message,
         data: backendData,
       },
-      { status: 200 }
+      { status: 200 } 
     );
 
   } catch (err) {
     console.error("API error:", err);
     return NextResponse.json(
-      { message: "Server error, please try again later ❌" },
+      { message: "Server error, please try again later" },
       { status: 500 }
     );
   }
