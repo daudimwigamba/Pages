@@ -10,11 +10,11 @@ export default function ViewAccountInfo() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any | null>(null);
   const [form, setForm] = useState({
-    fullName: "",
-    idno: "",
+    firstName: "",
+    identificationNumber: "",
     email: "",
     address: "",
-    phoneno: "",
+    contact: "",
     gender: "",
   });
 
@@ -25,10 +25,10 @@ export default function ViewAccountInfo() {
   async function fetchUsers() {
     setLoading(true);
     try {
-      const res = await fetch(baseUrl + "/",{
+      const res = await fetch(baseUrl + "/customers/fetch-all",{
         method: "GET",
         headers:{"Content-Type": "application/json",},
-      } );
+      });
       const data = await res.json();
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -41,11 +41,11 @@ export default function ViewAccountInfo() {
   function openEdit(user: any) {
     setEditingUser(user);
     setForm({
-      fullName: user.fullName || "",
-      idno: user.idno || "",
+      firstName: user.firstName || "",
+      identificationNumber: user.identificationNumber || "",
       email: user.email || "",
       address: user.address || "",
-      phoneno: user.phoneno || "",
+      contact: user.contact || "",
       gender: user.gender || "",
     });
     setIsModalOpen(true);
@@ -75,7 +75,7 @@ export default function ViewAccountInfo() {
       }
 
       // Update local state
-      setUsers((prev) => prev.map((u) => (u.idno === form.idno ? json.user : u)));
+      setUsers((prev) => prev.map((u) => (u.identificationNumber === form.identificationNumber ? json.user : u)));
       closeModal();
     } catch (err) {
       console.error("Update failed:", err);
@@ -83,13 +83,13 @@ export default function ViewAccountInfo() {
     }
   }
 
-  async function handleDelete(idno: string) {
+  async function handleDelete(identificationNumber: string) {
     if (!confirm("Are you sure you want to delete this account?")) return;
     try {
       const res = await fetch("/api/accountinfo", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idno }),
+        body: JSON.stringify({ identificationNumber }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -97,7 +97,7 @@ export default function ViewAccountInfo() {
         return;
       }
       // Remove locally
-      setUsers((prev) => prev.filter((u) => u.idno !== idno));
+      setUsers((prev) => prev.filter((u) => u.identificationNumber !== identificationNumber));
     } catch (err) {
       console.error("Delete failed:", err);
       alert("Delete failed");
@@ -114,7 +114,7 @@ export default function ViewAccountInfo() {
         <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
           {users.map((user) => (
             <section
-              key={user.idno}
+              key={user.identificationNumber}
               className="bg-white shadow-md rounded-xl p-6"
             >
               <h2 className="text-xl font-bold mb-2">Account Information</h2>
@@ -123,12 +123,12 @@ export default function ViewAccountInfo() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-semibold text-gray-700">Full Name:</span>
-                  <span className="text-gray-800 font-bold">{user.fullName}</span>
+                  <span className="text-gray-800 font-bold">{user.firstName}</span>
                 </div>
 
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-semibold text-gray-700">Id Number:</span>
-                  <span className="text-gray-800">{user.idno}</span>
+                  <span className="text-gray-800">{user.identificationNumber}</span>
                 </div>
 
                 <div className="flex justify-between border-b pb-2">
@@ -143,7 +143,7 @@ export default function ViewAccountInfo() {
 
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-semibold text-gray-700">Contact:</span>
-                  <span className="text-gray-800">{user.phoneno}</span>
+                  <span className="text-gray-800">{user.contact}</span>
                 </div>
 
                 <div className="flex justify-between border-b pb-2">
@@ -160,7 +160,7 @@ export default function ViewAccountInfo() {
                   Edit Info
                 </button>
                 <button
-                  onClick={() => handleDelete(user.idno)}
+                  onClick={() => handleDelete(user.identificationNumber)}
                   className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition"
                 >
                   Delete Account
@@ -190,8 +190,8 @@ export default function ViewAccountInfo() {
               <label className="flex flex-col">
                 <span className="text-sm font-medium text-gray-600">Full Name</span>
                 <input
-                  name="fullName"
-                  value={form.fullName}
+                  name="firstName"
+                  value={form.firstName}
                   onChange={handleChange}
                   className="border rounded px-3 py-2"
                 />
@@ -200,8 +200,8 @@ export default function ViewAccountInfo() {
               <label className="flex flex-col">
                 <span className="text-sm font-medium text-gray-600">Id Number (readonly)</span>
                 <input
-                  name="idno"
-                  value={form.idno}
+                  name="identificationNumber"
+                  value={form.identificationNumber}
                   readOnly
                   className="border rounded px-3 py-2 bg-gray-100"
                 />
@@ -230,8 +230,8 @@ export default function ViewAccountInfo() {
               <label className="flex flex-col">
                 <span className="text-sm font-medium text-gray-600">Phone No</span>
                 <input
-                  name="phoneno"
-                  value={form.phoneno}
+                  name="contact"
+                  value={form.contact}
                   onChange={handleChange}
                   className="border rounded px-3 py-2"
                 />
@@ -258,7 +258,7 @@ export default function ViewAccountInfo() {
                 Cancel
               </button>
               <button
-                 onClick={handleSave}
+                 onClick={() => handleSave(editingUser.identificationNumber)}
                 className="px-4 py-2 rounded bg-blue-600 text-white"
               >
                 Save Changes
