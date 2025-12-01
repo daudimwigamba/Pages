@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { FaUserPlus, FaUserCog, FaBars, FaSignOutAlt } from "react-icons/fa";
+import { FaUserPlus, FaUserCog, FaBars, FaSignOutAlt, FaUser } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 

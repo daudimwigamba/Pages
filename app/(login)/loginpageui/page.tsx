@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@radix-ui/react-switch";
+import { baseUrl } from "@/lib/constants";
 
 function LoginPage() {
   const [domainEmail, setName] = useState("");
@@ -17,7 +18,7 @@ function LoginPage() {
     setResponseData(null);
 
     try {
-      const res = await fetch("http://192.168.12.28:8080/api/auth/login", {
+      const res = await fetch(baseUrl + "/staffs/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ domainEmail, domainPassword }),
@@ -44,8 +45,6 @@ function LoginPage() {
       else {
         alert("Login failed. No token received.")
       }
-
-
       setResponseData(data); // display the JSON data
     } catch (error) {
       console.error(error);

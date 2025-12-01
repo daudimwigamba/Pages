@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     // 3️⃣ Forward data to backend
     const backendRes = await fetch(
-      "http://192.168.12.28:8080/api/auth/addReturn",
+      "http://192.168.12.28:8080/api/v1/customers/create",
       {
         method: "POST",
         headers: {

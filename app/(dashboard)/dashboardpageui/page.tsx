@@ -1,4 +1,5 @@
 "use client";
+import { baseUrl } from "@/lib/constants";
 import React, { useState } from "react";
 
 const HomePage = () => {
@@ -95,9 +96,10 @@ const HomePage = () => {
       console.log(formToSend);
 
     try {
-      const res = await fetch("/api/userdata", {
+      const res = await fetch("/api/dashboard", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", 
+         },
         body: JSON.stringify(formToSend),
       });
 
