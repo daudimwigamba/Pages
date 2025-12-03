@@ -96,7 +96,7 @@ const HomePage = () => {
       console.log(formToSend);
 
     try {
-      const res = await fetch("/api/dashboard", {
+      const res = await fetch( baseUrl + "/customers/create", {
         method: "POST",
         headers: { "Content-Type": "application/json", 
          },
@@ -129,7 +129,7 @@ const HomePage = () => {
       } 
       else 
         {
-        setMessage(data.message || "Failed to submit details");
+        setMessage(data.error || "Failed to submit details");
       }
     } catch (err) {
       setMessage("Server error, please try again later ");

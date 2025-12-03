@@ -45,7 +45,7 @@ function LoginPage() {
       else {
         alert("Login failed. No token received.")
       }
-      setResponseData(data); // display the JSON data
+      // setResponseData(data); // displaying the JSON data
     } catch (error) {
       console.error(error);
       setResponseData({ error: "Something went wrong!" });
