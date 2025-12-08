@@ -4,12 +4,21 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@radix-ui/react-switch";
 import { baseUrl } from "@/lib/constants";
+import ErrorModal from "@/components/ErrorModal";
+import SuccessModal from "@/components/SuccessModal";
 
 function LoginPage() {
   const [domainEmail, setName] = useState("");
   const [domainPassword, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [responseData, setResponseData] = useState<any>(null); // store JSON response
+
+//modal responses
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [errorOpen, setErrorOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+
 
   //handling submit form request
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,20 +44,29 @@ function LoginPage() {
           body: JSON.stringify({token}),
         });
 
-      if (cookieRes.ok) {
-        window.location.href = "/dashboardpageui";
+      if (cookieRes.ok) 
+        {
+        setModalMessage("Attempt successful. You will be redirected shortly.")
+        setSuccessOpen(true)
+
+        setTimeout(() => {
+          window.location.href = "/dashboardpageui";
+        }, 1500)
       }
       else {
-        alert("Failure to save token cookie!")
+        setModalMessage("Failed to authenticate token")
+        setErrorOpen(true)
       }
       }
       else {
-        alert("Login failed. No token received.")
+        setModalMessage("Invalid username or password!")
+        setErrorOpen(true)
       }
       // setResponseData(data); // displaying the JSON data
     } catch (error) {
       console.error(error);
-      setResponseData({ error: "Something went wrong!" });
+      setModalMessage("Unable to connect to server!")
+      setErrorOpen(true)
     } finally {
       setLoading(false);
     }
@@ -56,6 +74,18 @@ function LoginPage() {
 
   return (
     <div className="flex left-0">
+      <SuccessModal
+      isOpen={successOpen}
+      message={modalMessage}
+      onClose={() => setSuccessOpen(false)}
+    />
+
+    <ErrorModal
+      isOpen={errorOpen}
+      message={modalMessage}
+      onClose={() => setErrorOpen(false)}
+    />
+
       {/* Left side logo */}
       <div className="w-200 h-250 bg-blue-400">
         <Image
