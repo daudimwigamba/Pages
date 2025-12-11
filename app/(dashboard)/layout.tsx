@@ -27,16 +27,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Logout handler
   const handleLogout = async () => {
     try {
-      const response = await fetch( baseUrl + "staffs/logout", {
+      const url = `${baseUrl.replace(/\/+$/, "")}/staffs/logout`;
+      const response = await fetch( url , {
         method: "POST",
         credentials: "include", // send cookies if your refresh token is HTTP-only
+        // headers: { "Content-Type ": "application/json"},
+        // body: JSON.stringify({}) 
       });
+
+      console.log("Logout response status: ", response.status, response.statusText);
+      const text = await response.text();
 
       if (response.ok) {
         // Redirect to login after successful logout
         router.push("/loginpageui");
       } else {
-        console.error("Logout failed");
+        if (response.status === 401 || response.status === 403) {
+          console.warn("Not authenticated and forbidden - clearing client state and redirecting.");
+          router.push("/loginpageui")
+        }
+        else {
+          console.error("Logout failed: ", response.status, text)
+        }
       }
     } catch (err) {
       console.error("Logout error:", err);

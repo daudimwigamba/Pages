@@ -35,13 +35,13 @@ function LoginPage() {
 
       const data = await res.json();
 
-      const token = data.token;
+      const accessToken = data.accessToken;
 
-      if (token) {
+      if (accessToken) {
         const cookieRes = await fetch("/api/login", {
           method: "POST",
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({token}),
+          body: JSON.stringify({accessToken}),
         });
 
       if (cookieRes.ok) 
@@ -54,7 +54,7 @@ function LoginPage() {
         }, 1500)
       }
       else {
-        setModalMessage("Failed to authenticate token")
+        setModalMessage("Failed to authenticate accessToken")
         setErrorOpen(true)
       }
       }
