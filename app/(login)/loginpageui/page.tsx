@@ -46,7 +46,7 @@ function LoginPage() {
 
       if (cookieRes.ok) 
         {
-        setModalMessage("Attempt successful. You will be redirected shortly.")
+        setModalMessage("Attempt successful")
         setSuccessOpen(true)
 
         setTimeout(() => {

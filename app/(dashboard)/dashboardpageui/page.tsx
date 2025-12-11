@@ -1,6 +1,8 @@
 "use client";
 import { baseUrl } from "@/lib/constants";
 import React, { useState } from "react";
+import SuccessModal from "@/components/SuccessModal";
+import ErrorModal from "@/components/ErrorModal";
 
 const HomePage = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +22,11 @@ const HomePage = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
+
+  //modal response
+      const [successOpen, setSuccessOpen] = useState(false);
+      const [errorOpen, setErrorOpen] = useState(false);
+      const [modalMessage, setModalMessage] = useState("");
 
   //convert yyyy-mm-dd -> dd-mm-yyyy
   const formatDateToDDMMYYYY = (date: string) =>
@@ -107,7 +114,8 @@ const HomePage = () => {
       console.log(data);
 
       if (res.ok) {
-        setMessage("Details submitted successfully ");
+        setModalMessage("Your data has been submitted successfully!")
+        setSuccessOpen(true)
         setFormData({
           firstName: "",
           middleName: "",
@@ -129,16 +137,32 @@ const HomePage = () => {
       } 
       else 
         {
-        setMessage(data.error || "Failed to submit details");
+        setModalMessage(data.error || "Failed to submit details");
+        setErrorOpen(true)
       }
     } catch (err) {
-      setMessage("Server error, please try again later ");
+      setModalMessage("Server error, please try again later ");
+      setErrorOpen(true)
       console.error(err);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-start px-4 py-8">
+    <>
+        {/* Modals */}
+      <SuccessModal
+        isOpen={successOpen}
+        message={modalMessage}
+        onClose={() => setSuccessOpen(false)}
+      />
+
+      <ErrorModal
+        isOpen={errorOpen}
+        message={modalMessage}
+        onClose={() => setErrorOpen(false)}
+      />
+
+      <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-start px-4 py-8">
       <h1 className="text-2xl text-orange-400 text-center mb-6">
         Welcome to the Dashboard
       </h1>
@@ -210,9 +234,6 @@ const HomePage = () => {
               list="IDType"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
             />
-            <datalist id="IDType">
-              <option value="NIDA" />
-            </datalist>
             {errors.identificationType && <p className="text-red-500 text-sm">{errors.identificationType}</p>}
           </div>
 
@@ -335,6 +356,7 @@ const HomePage = () => {
         )}
       </section>
     </main>
+    </>
   );
 };
 

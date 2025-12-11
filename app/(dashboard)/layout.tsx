@@ -1,9 +1,10 @@
 'use client'
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { FaUserPlus, FaUserCog, FaBars, FaSignOutAlt, FaUser } from "react-icons/fa";
+import { usePathname, useRouter } from "next/navigation";
+import { FaUserPlus, FaUserCog, FaBars, FaSignOutAlt } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
+import { baseUrl } from "@/lib/constants";
 
 const navItems = [
   { name: "Create Account", href: "/dashboardpageui", icon: <FaUserPlus size={20} /> },
@@ -12,6 +13,7 @@ const navItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(true);
 
   // Dynamically update sidebar width (optional)
@@ -21,6 +23,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       isExpanded ? "16rem" : "5rem"
     );
   }, [isExpanded]);
+
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      const response = await fetch( baseUrl + "staffs/logout", {
+        method: "POST",
+        credentials: "include", // send cookies if your refresh token is HTTP-only
+      });
+
+      if (response.ok) {
+        // Redirect to login after successful logout
+        router.push("/loginpageui");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
 
   return (
     <div className="flex h-screen">
@@ -72,13 +93,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Logout */}
         <div className="px-3 py-4">
-          <button className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-red-100 rounded-lg transition w-full">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-red-100 rounded-lg transition w-full"
+          >
             <FaSignOutAlt size={20} />
-            {isExpanded && (
-              <span>
-                <Link href="/loginpageui">Logout</Link>
-              </span>
-            )}
+            {isExpanded && <span>Logout</span>}
           </button>
         </div>
       </aside>
