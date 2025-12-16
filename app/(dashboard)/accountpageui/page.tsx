@@ -40,8 +40,6 @@ export default function ViewAccountInfo() {
   const [errorOpen, setErrorOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
-  // Pending update state
-  const [pendingUpdate, setPendingUpdate] = useState<any | null>(null);
 
   // Search & Pagination
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,19 +56,18 @@ export default function ViewAccountInfo() {
       const res = await fetch(`${baseUrl}/customers/fetch-all`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("Fetch users failed:", err);
+        console.error("Fetch users failed:");
         setUsers([]);
         setModalMessage("Failed to fetch customers.");
         setErrorOpen(true);
         return;
       }
 
-      const data = await res.json();
-      setUsers(Array.isArray(data) ? data : []);
+
     } catch (err) {
       console.error("Failed to fetch users:", err);
       setUsers([]);
@@ -134,11 +131,15 @@ export default function ViewAccountInfo() {
     }
 
     setSaving(true);
+
+    const { id: _, ...payload} = form
+
     try {
       const res = await fetch(`${baseUrl}/customers/update/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
+        credentials: "include",
       });
 
       const json = await res.json().catch(() => ({}));
@@ -152,8 +153,6 @@ export default function ViewAccountInfo() {
 
       const updatedUser = json.user ?? json;
 
-      // Store update temporarily
-      setPendingUpdate(updatedUser);
 
       // Close edit modal but do NOT update table yet
       closeModal();
@@ -192,6 +191,7 @@ export default function ViewAccountInfo() {
       const res = await fetch(`${baseUrl}/customers/delete/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
       });
 
       const json = await res.json().catch(() => ({}));
@@ -248,14 +248,6 @@ export default function ViewAccountInfo() {
         message={modalMessage}
         onClose={() => {
           setSuccessOpen(false);
-
-          // Apply pending update after modal closes
-          if (pendingUpdate) {
-            setUsers((prev) =>
-              prev.map((u) => (u.id === pendingUpdate.id ? pendingUpdate : u))
-            );
-            setPendingUpdate(null);
-          }
         }}
       />
       <ErrorModal
@@ -268,7 +260,7 @@ export default function ViewAccountInfo() {
       {isConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setIsConfirmOpen(false)} />
-          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6 z-10 text-center">
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6 z-10 text-center mx-3">
             <h3 className="text-xl font-semibold mb-3">Confirm Deletion</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete this customer? This action cannot be undone.
@@ -292,11 +284,11 @@ export default function ViewAccountInfo() {
       <h1 className="text-3xl font-bold">Customers</h1>
 
       {/* Search */}
-      <div className="flex justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-3 mb-4">
         <input
           type="text"
           placeholder="Search by name, email or ID number"
-          className="border border-gray-300 rounded-full p-2 px-4 focus:ring-blue-400 focus:outline-none w-250"
+          className="border border-gray-300 rounded-full p-2 px-4 focus:ring-blue-400 focus:outline-none w-full sm:w-80"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -306,44 +298,50 @@ export default function ViewAccountInfo() {
       </div>
 
       {/* Table */}
-      <table className="w-full border border-blue-300 rounded-lg overflow-hidden">
+      <table className="min-w-[1100px] w-full border border-blue-300 rounded-lg overflow-hidden">
         <thead className="bg-blue-100">
           <tr>
             <th className="p-3 text-left">Full Name</th>
-            <th className="p-3 text-left">Date of Birth</th>
+            <th className="p-3 text-left hidden sm:table-cell">Date of Birth</th>
             <th className="p-3 text-left">ID Number</th>
-            <th className="p-3 text-left">ID Type</th>
-            <th className="p-3 text-left">Email</th>
-            <th className="p-3 text-left">Address</th>
-            <th className="p-3 text-left">Contact</th>
-            <th className="p-3 text-left">Gender</th>
+            <th className="p-3 text-left hidden md:table-cell">ID Type</th>
+            <th className="p-3 text-left hidden lg:table-cell">Email</th>
+            <th className="p-3 text-left hidden xl:table-cell">Address</th>
+            <th className="p-3 text-left hidden md:table-cell">Contact</th>
+            <th className="p-3 text-left hidden md:table-cell">Gender</th>
             <th className="p-3 text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           {displayedUsers.map((user) => (
             <tr key={user.id} className="border-t border-gray-200 hover:bg-gray-50">
-              <td className="p-3">{user.firstName} {user.middleName} {user.lastName}</td>
-              <td className="p-3">{user.dateOfBirth}</td>
+              <td className="p-3 whitespace-nowrap">
+                  {user.firstName} {user.middleName} {user.lastName}
+              </td>
+              <td className="p-3 hidden sm:table-cell">{user.dateOfBirth}</td>
               <td className="p-3">{user.identificationNumber}</td>
-              <td className="p-3">{user.identificationType}</td>
-              <td className="p-3">{user.email}</td>
-              <td className="p-3">{user.address}</td>
-              <td className="p-3">{user.contact}</td>
-              <td className="p-3">{user.gender}</td>
-              <td className="p-3 flex justify-center gap-2">
+              <td className="p-3 hidden md:table-cell">{user.identificationType}</td>
+              <td className="p-3 hidden lg:table-cell">{user.email}</td>
+              <td className="p-3 hidden xl:table-cell">{user.address}</td>
+              <td className="p-3 hidden md:table-cell">{user.contact}</td>
+              <td className="p-3 hidden md:table-cell">{user.gender}</td>
+
+            
+              <td className="p-3">
+                <div className="flex flex-col sm:flex-row justify-center gap-2">
                 <button
                   onClick={() => openEdit(user)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => requestDelete(user.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
                 >
                   Delete
                 </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -359,7 +357,7 @@ export default function ViewAccountInfo() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center mt-4">
           <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -384,7 +382,7 @@ export default function ViewAccountInfo() {
       {isModalOpen && (
         <div className="fixed inset-0 z-60 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={closeModal} />
-          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-xl p-6 z-70">
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-xl p-6 z-70 mx-3">
             <h3 className="text-xl font-semibold mb-4">Edit Account</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[

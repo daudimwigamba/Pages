@@ -108,6 +108,7 @@ const HomePage = () => {
         headers: { "Content-Type": "application/json", 
          },
         body: JSON.stringify(formToSend),
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -162,15 +163,15 @@ const HomePage = () => {
         onClose={() => setErrorOpen(false)}
       />
 
-      <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-start px-4 py-8">
-      <h1 className="text-2xl text-orange-400 text-center mb-6">
+      <main className="min-h-screen bg-gray-100 flex flex-col items-center px-3 sm:px-6 py-6">
+      <h1 className="text-xl sm:text-2xl text-orange-400 text-center mb-6">
         Welcome to the Dashboard
       </h1>
 
-      <section className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8">
-        <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
+      <section className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">Create Account</h2>
 
-        <form onSubmit={handleSubmit} className="grid sm:grid-cols-3 gap-x-8 gap-y-5">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {/* First Name */}
           <div>
             <label className="block text-gray-950 mb-1">First Name</label>
@@ -179,7 +180,7 @@ const HomePage = () => {
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
           </div>
@@ -192,7 +193,7 @@ const HomePage = () => {
               name="middleName"
               value={formData.middleName}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.middleName && <p className="text-red-500 text-sm">{errors.middleName}</p>}
           </div>
@@ -205,7 +206,7 @@ const HomePage = () => {
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
           </div>
@@ -218,7 +219,7 @@ const HomePage = () => {
               name="dateOfBirth"
               value={formData.dateOfBirth}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.dateOfBirth && <p className="text-red-500 text-sm">{errors.dateOfBirth}</p>}
           </div>
@@ -232,7 +233,7 @@ const HomePage = () => {
               value={formData.identificationType}
               onChange={handleChange}
               list="IDType"
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.identificationType && <p className="text-red-500 text-sm">{errors.identificationType}</p>}
           </div>
@@ -245,7 +246,7 @@ const HomePage = () => {
               name="identificationNumber"
               value={formData.identificationNumber}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.identificationNumber && <p className="text-red-500 text-sm">{errors.identificationNumber}</p>}
           </div>
@@ -258,7 +259,7 @@ const HomePage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
@@ -271,7 +272,7 @@ const HomePage = () => {
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
           </div>
@@ -284,7 +285,7 @@ const HomePage = () => {
               name="contact"
               value={formData.contact}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             />
             {errors.contact && <p className="text-red-500 text-sm">{errors.contact}</p>}
           </div>
@@ -296,7 +297,7 @@ const HomePage = () => {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             >
                 <option value="">Select..</option>
               <option value="Male">Male</option>
@@ -311,13 +312,13 @@ const HomePage = () => {
               name="marriageStatus"
               value={formData.marriageStatus}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none"
             >
               <option value="">Select..</option>
               <option value="Single">Single</option>
               <option value="Married">Married</option>
               <option value="Separated">Separated</option>
-              <option value="Widowed">Widowed</option>
+              <option value="widowed">Widowed</option>
             </select>
           </div>
 
@@ -330,7 +331,7 @@ const HomePage = () => {
               value={formData.spouseName}
               onChange={handleChange}
               disabled={formData.marriageStatus === "Single"}
-              className={`w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-400 focus:outline-none ${
+              className={`w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-400 focus:outline-none ${
                 formData.marriageStatus === "Single" ? "bg-gray-100 cursor-not-allowed" : ""
               }`}
             />
@@ -339,7 +340,7 @@ const HomePage = () => {
 
           <button
             type="submit"
-            className="bg-blue-400 hover:bg-blue-500 text-white font-semibold w-40 py-2 rounded-full col-span-full mt-6 mx-65"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full sm:w-48 py-3 rounded-full col-span-full mt-8 mx-auto"
           >
             Submit
           </button>

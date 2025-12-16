@@ -1,10 +1,10 @@
-'use client'
-import { useState, useEffect } from "react";
+"use client";
+
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { FaUserPlus, FaUserCog, FaBars, FaSignOutAlt } from "react-icons/fa";
+import { FaUserPlus, FaUserCog, FaBars, FaSignOutAlt, FaTimes } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
-import { baseUrl } from "@/lib/constants";
 
 const navItems = [
   { name: "Create Account", href: "/dashboardpageui", icon: <FaUserPlus size={20} /> },
@@ -14,113 +14,123 @@ const navItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isExpanded, setIsExpanded] = useState(true);
 
-  // Dynamically update sidebar width (optional)
-  useEffect(() => {
-    document.documentElement.style.setProperty(
-      "--sidebar-width",
-      isExpanded ? "16rem" : "5rem"
-    );
-  }, [isExpanded]);
+  const [isExpanded, setIsExpanded] = useState(true); // desktop collapse
+  const [mobileOpen, setMobileOpen] = useState(false); // mobile drawer
 
-  // Logout handler
   const handleLogout = async () => {
     try {
-      const url = `${baseUrl.replace(/\/+$/, "")}/staffs/logout`;
-      const response = await fetch( url , {
-        method: "POST",
-        credentials: "include", // send cookies if your refresh token is HTTP-only
-        // headers: { "Content-Type ": "application/json"},
-        // body: JSON.stringify({}) 
-      });
-
-      console.log("Logout response status: ", response.status, response.statusText);
-      const text = await response.text();
-
-      if (response.ok) {
-        // Redirect to login after successful logout
-        router.push("/loginpageui");
-      } else {
-        if (response.status === 401 || response.status === 403) {
-          console.warn("Not authenticated and forbidden - clearing client state and redirecting.");
-          router.push("/loginpageui")
-        }
-        else {
-          console.error("Logout failed: ", response.status, text)
-        }
-      }
+      await fetch("/api/logout", { method: "POST" });
+      router.push("/loginpageui");
     } catch (err) {
-      console.error("Logout error:", err);
+      console.error("Logout failed", err);
     }
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
+    <div className="flex h-screen overflow-hidden">
+      {/* MOBILE OVERLAY */}
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+        />
+      )}
+
+      {/* SIDEBAR */}
       <aside
-        className={`${
-          isExpanded ? "w-64" : "w-20"
-        } bg-gray-50 shadow-lg flex flex-col fixed left-0 top-0 h-full transition-all duration-300 z-50`}
+        className={`
+          fixed lg:static top-0 left-0 h-full z-50
+          bg-gray-50 shadow-xl
+          transition-all duration-300
+          ${isExpanded ? "w-64" : "w-20"}
+          ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0
+        `}
       >
-        {/* Top Section */}
-        <div className="flex items-center justify-between px-4 py-3">
+        {/* HEADER */}
+        <div className="flex items-center justify-between px-4 py-4 border-b">
           {isExpanded && (
             <Image
               src="/logo.png"
               alt="MHB logo"
-              width={200}
-              height={200}
+              width={140}
+              height={40}
               className="object-contain"
             />
           )}
+
+          {/* DESKTOP TOGGLE */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 rounded-md hover:bg-gray-200 transition"
+            className="hidden lg:flex p-2 rounded hover:bg-gray-200"
           >
-            <FaBars size={20} />
+            <FaBars />
+          </button>
+
+          {/* MOBILE CLOSE */}
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="lg:hidden p-2 rounded hover:bg-gray-200"
+          >
+            <FaTimes />
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-2">
+        {/* NAV */}
+        <nav className="flex-1 px-3 py-6 space-y-2">
           {navItems.map((item) => {
             const active = pathname === item.href;
+
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-2 rounded-lg transition ${
-                  active
-                    ? "bg-blue-400 text-white"
-                    : "text-gray-700 hover:bg-blue-100"
-                }`}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition
+                  ${
+                    active
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700 hover:bg-blue-100"
+                  }`}
               >
                 {item.icon}
-                {isExpanded && <span>{item.name}</span>}
+                {isExpanded && <span className="whitespace-nowrap">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
-        {/* Logout */}
-        <div className="px-3 py-4">
+        {/* LOGOUT */}
+        <div className="px-3 py-4 border-t">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-red-100 rounded-lg transition w-full"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg
+                       text-gray-700 hover:bg-red-100 w-full transition"
           >
-            <FaSignOutAlt size={20} />
+            <FaSignOutAlt />
             {isExpanded && <span>Logout</span>}
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main
-        className={`flex-1 pl-[var(--sidebar-width)] transition-all duration-300 bg-gray-100 overflow-y-auto p-6`}
-      >
-        {children}
-      </main>
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex flex-col">
+        {/* TOP BAR (MOBILE) */}
+        <header className="lg:hidden bg-white shadow px-4 py-3 flex items-center">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 rounded hover:bg-gray-200"
+          >
+            <FaBars />
+          </button>
+          <h1 className="ml-4 font-semibold text-gray-700">Dashboard</h1>
+        </header>
+
+        <main className="flex-1 bg-gray-100 overflow-y-auto p-4 sm:p-6">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

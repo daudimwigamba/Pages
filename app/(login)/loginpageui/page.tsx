@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@radix-ui/react-switch";
 import { baseUrl } from "@/lib/constants";
 import ErrorModal from "@/components/ErrorModal";
 import SuccessModal from "@/components/SuccessModal";
@@ -11,7 +10,6 @@ function LoginPage() {
   const [domainEmail, setName] = useState("");
   const [domainPassword, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [responseData, setResponseData] = useState<any>(null); // store JSON response
 
 //modal responses
   const [successOpen, setSuccessOpen] = useState(false);
@@ -24,27 +22,17 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setResponseData(null);
 
     try {
       const res = await fetch(baseUrl + "/staffs/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ domainEmail, domainPassword }),
+        credentials: "include",
       });
 
-      const data = await res.json();
 
-      const accessToken = data.accessToken;
-
-      if (accessToken) {
-        const cookieRes = await fetch("/api/login", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({accessToken}),
-        });
-
-      if (cookieRes.ok) 
+      if (res.ok) 
         {
         setModalMessage("Attempt successful")
         setSuccessOpen(true)
@@ -52,11 +40,6 @@ function LoginPage() {
         setTimeout(() => {
           window.location.href = "/dashboardpageui";
         }, 1500)
-      }
-      else {
-        setModalMessage("Failed to authenticate accessToken")
-        setErrorOpen(true)
-      }
       }
       else {
         setModalMessage("Invalid username or password!")
@@ -73,8 +56,9 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex left-0">
-      <SuccessModal
+  <div className="flex flex-col lg:flex-row min-h-screen">
+    {/* ✅ DO NOT TOUCH MODALS */}
+    <SuccessModal
       isOpen={successOpen}
       message={modalMessage}
       onClose={() => setSuccessOpen(false)}
@@ -86,22 +70,36 @@ function LoginPage() {
       onClose={() => setErrorOpen(false)}
     />
 
-      {/* Left side logo */}
-      <div className="w-200 h-250 bg-blue-400">
-        <Image
-          src="/logo2.png"
-          alt="mhb logo"
-          width={500}
-          height={500}
-          className="mt-50 ml-25"
-        />
-      </div>
+    {/* Left side logo */}
+    <div className="
+      hidden lg:flex 
+      lg:w-1/2 
+      bg-blue-400 
+      items-center 
+      justify-center
+    ">
+      <Image
+        src="/logo2.png"
+        alt="mhb logo"
+        width={500}
+        height={500}
+        className="max-w-[70%] h-auto"
+      />
+    </div>
 
-      {/* Right side form */}
-      <div className="w-200 h-200 bg-white flex flex-col items-center justify-center">
+    {/* Right side form */}
+    <div className="
+      flex 
+      flex-1 
+      bg-white 
+      items-center 
+      justify-center 
+      px-4
+    ">
+      <div className="w-full max-w-sm">
         <form
           onSubmit={handleSubmit}
-          className="max-w-sm mx-auto my-10 space-y-4"
+          className="space-y-4"
         >
           <h1 className="text-xl font-extrabold text-black text-center">
             Sign In
@@ -128,27 +126,22 @@ function LoginPage() {
             className="w-full border-2 rounded p-2 border-black text-black outline-none"
             required
           />
+
           <Button
             type="submit"
             disabled={loading}
-            variant="outline" size="lg" aria-label="Submit" className="bg-blue-400 hover:bg-blue-300 w-full rounded-md my-6"
+            variant="outline"
+            size="lg"
+            aria-label="Submit"
+            className="bg-blue-400 hover:bg-blue-300 w-full rounded-md my-6"
           >
             {loading ? "Loading..." : "Login"}
           </Button>
         </form>
-
-        {/* Display JSON response below form */}
-        {responseData && (
-          <div className="mt-6 bg-gray-100 p-4 rounded w-[400px] text-left">
-            <h2 className="font-semibold text-black mb-2">Server Response:</h2>
-            <pre className="text-sm text-gray-800 bg-white p-2 rounded overflow-auto">
-              {JSON.stringify(responseData, null, 2)}
-            </pre>
-          </div>
-        )}
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default LoginPage;
