@@ -24,7 +24,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(baseUrl + "/staffs/login", {
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ domainEmail, domainPassword }),

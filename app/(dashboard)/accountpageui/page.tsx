@@ -3,6 +3,7 @@ import { baseUrl } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import SuccessModal from "@/components/SuccessModal";
 import ErrorModal from "@/components/ErrorModal";
+import { getAccessToken } from "@/lib/auth";
 
 export default function ViewAccountInfo() {
   const [users, setUsers] = useState<any[]>([]);
@@ -53,10 +54,14 @@ export default function ViewAccountInfo() {
   async function fetchUsers() {
     setLoading(true);
     try {
+      const accessToken = getAccessToken();
       const res = await fetch(`${baseUrl}/customers/fetch-all`, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: 
+        { 
+          "Content-Type": "application/json",
+           Authorization: `Bearer ${accessToken}`
+        },
       });
 
       if (!res.ok) {
@@ -67,6 +72,8 @@ export default function ViewAccountInfo() {
         return;
       }
 
+      const data = await res.json();
+      setUsers(Array.isArray(data) ? data : data.customers || []);
 
     } catch (err) {
       console.error("Failed to fetch users:", err);
@@ -135,11 +142,12 @@ export default function ViewAccountInfo() {
     const { id: _, ...payload} = form
 
     try {
+      const accessToken = getAccessToken();
       const res = await fetch(`${baseUrl}/customers/update/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}`},
         body: JSON.stringify(payload),
-        credentials: "include",
+        
       });
 
       const json = await res.json().catch(() => ({}));
@@ -188,10 +196,13 @@ export default function ViewAccountInfo() {
     setIsConfirmOpen(false);
 
     try {
+      const accessToken = getAccessToken();
       const res = await fetch(`${baseUrl}/customers/delete/${id}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+           "Content-Type": "application/json", 
+           Authorization: `Bearer ${accessToken}` 
+          },
       });
 
       const json = await res.json().catch(() => ({}));

@@ -3,6 +3,8 @@ import { baseUrl } from "@/lib/constants";
 import React, { useState } from "react";
 import SuccessModal from "@/components/SuccessModal";
 import ErrorModal from "@/components/ErrorModal";
+import { getAccessToken } from "@/lib/auth";
+
 
 const HomePage = () => {
   const [formData, setFormData] = useState({
@@ -101,20 +103,39 @@ const HomePage = () => {
     };
 
       console.log(formToSend);
+      const accessToken = getAccessToken();
+
+      if(!accessToken)
+      {
+        setModalMessage("Authentication token missing. Please login again.");
+        setErrorOpen(true);
+        return;
+      }
 
     try {
       const res = await fetch( baseUrl + "/customers/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json", 
+        headers: { 
+          "Content-Type": "application/json", 
+          Authorization: `Bearer ${accessToken}`
          },
         body: JSON.stringify(formToSend),
-        credentials: "include",
       });
 
-      const data = await res.json();
-      console.log(data);
+      let data: any = null;
+       const contentType = res.headers.get("content-type");
 
-      if (res.ok) {
+      if (contentType && contentType.includes("application/json")) {
+      data = await res.json();
+    }
+
+    if (!res.ok) {
+      console.error("Backend error:", res.status, data);
+      setModalMessage(data?.error || "Access denied");
+      setErrorOpen(true);
+      return;
+    }
+
         setModalMessage("Your data has been submitted successfully!")
         setSuccessOpen(true)
         setFormData({
@@ -135,12 +156,7 @@ const HomePage = () => {
         setTimeout(() => {
           setMessage("");
         }, 2000);
-      } 
-      else 
-        {
-        setModalMessage(data.error || "Failed to submit details");
-        setErrorOpen(true)
-      }
+
     } catch (err) {
       setModalMessage("Server error, please try again later ");
       setErrorOpen(true)
